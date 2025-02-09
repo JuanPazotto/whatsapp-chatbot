@@ -5,26 +5,31 @@ const axios = require('axios');
 const app = express();
 app.use(bodyParser.json());
 
-const TOKEN = "benjamin";  // Insira seu token de acesso aqui
-const VERIFY_TOKEN = "EAAwFv30HgJYBO5gXxVyNMSnwkd7lcSUlMAxSFKu2fGxVMjMJsJ7PZAuItnjch61LWEYA5w6E4mLD6cjZCIH227GpOViG7OgYm4LGbfnDzQj2x4hihZA42Q5eIJwgXZCoQtbncgFg45CZChoncYWyooSOZBe2hEroTb7ZBQyGN21NB1Fj86ZC5wKH628M5zxKBnpxSpV7phI4vtIfRtm66LdGvX9WUaTI";  // Escolha um token de verificação
-const PHONE_NUMBER_ID = "532180333320069";  // Seu ID do número do WhatsApp
+// Substitua com seus dados reais
+const TOKEN = "EAAwFv30HgJYBO6KJluIdWdXw9wRSdSym2QnzfIZCnZBTIZA7LDbqhXnR0AvkZBeLB0FvwIjKoicPH5eVXWIq6bkuX6bQgJnhWmzAp0DcK8cFVPVFT85dy0J9bWxMo7fSngAZAjChr3jesWZCNZAVabzgmg6XBiLd0OyjvqbB76tCQR0hpKKKxHU9ZCs56kX6mpaSeI004VkkKZCk7eu9DCIRwy40ljQYZD";  // Token de acesso à API do Facebook (deve ser gerado no Facebook Developer)
+const VERIFY_TOKEN = "benjamin";  // Token de verificação (você escolhe esse valor, por exemplo, 'meu_token')
+const PHONE_NUMBER_ID = "532180333320069";  // O ID do número de WhatsApp que você obteve ao configurar o WhatsApp Business API
 
-// Rota de verificação do webhook
+// Rota de verificação do webhook (GET)
 app.get('/webhook', (req, res) => {
     const mode = req.query['hub.mode'];
     const token = req.query['hub.verify_token'];
     const challenge = req.query['hub.challenge'];
 
+    // Verifica se o token de verificação fornecido no Facebook Developer Console é o mesmo que o do código
     if (mode && token === VERIFY_TOKEN) {
-        res.status(200).send(challenge);
+        res.status(200).send(challenge);  // Retorna o desafio se a verificação for bem-sucedida
     } else {
-        res.status(403).send('Falha na verificação');
+        res.status(403).send('Falha na verificação');  // Se os tokens não coincidirem, retorna erro 403
     }
 });
 
-// Rota para receber mensagens
+// Rota para receber mensagens do WhatsApp (POST)
 app.post('/webhook', async (req, res) => {
     const body = req.body;
+
+    // Log para depuração
+    console.log('Corpo recebido:', body);
 
     if (body.object) {
         const message = body.entry[0]?.changes[0]?.value?.messages?.[0];
@@ -37,26 +42,35 @@ app.post('/webhook', async (req, res) => {
             // Responder automaticamente
             await sendMessage(phone, "Olá! Bem-vindo ao salão. Como posso ajudar?");
         }
-        res.sendStatus(200);
+        res.sendStatus(200);  // Responde com sucesso (código 200)
     } else {
-        res.sendStatus(404);
+        res.sendStatus(404);  // Se não encontrar a estrutura esperada, responde com erro 404
     }
 });
 
 // Função para enviar mensagens no WhatsApp
 async function sendMessage(phone, text) {
-    await axios.post(
-        `https://graph.facebook.com/v17.0/${PHONE_NUMBER_ID}/messages`,
-        {
-            messaging_product: "whatsapp",
-            to: phone,
-            text: { body: text }
-        },
-        {
-            headers: { Authorization: `Bearer ${TOKEN}` }
-        }
-    );
+    try {
+        await axios.post(
+            `https://graph.facebook.com/v17.0/${PHONE_NUMBER_ID}/messages`,
+            {
+                messaging_product: "whatsapp",
+                to: phone,
+                text: { body: text },
+            },
+            {
+                headers: {
+                    Authorization: `Bearer ${TOKEN}`,
+                },
+            }
+        );
+    } catch (error) {
+        console.error('Erro ao enviar mensagem:', error);
+    }
 }
 
+// Inicia o servidor na porta 3000 ou na porta configurada no ambiente
 const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => console.log(`Servidor rodando na porta ${PORT}`));
+app.listen(PORT, () => {
+    console.log(`Servidor rodando na porta ${PORT}`);
+});
