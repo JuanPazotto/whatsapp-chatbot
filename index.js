@@ -5,9 +5,9 @@ const axios = require('axios');
 const app = express();
 app.use(bodyParser.json());
 
-const TOKEN = "SEU_TOKEN_DE_ACESSO";  // Insira seu token de acesso aqui
-const VERIFY_TOKEN = "SEU_TOKEN_DE_VERIFICACAO";  // Escolha um token de verificação
-const PHONE_NUMBER_ID = "SEU_PHONE_NUMBER_ID";  // Seu ID do número do WhatsApp
+const TOKEN = "benjamin";  // Insira seu token de acesso aqui
+const VERIFY_TOKEN = "EAAwFv30HgJYBO5gXxVyNMSnwkd7lcSUlMAxSFKu2fGxVMjMJsJ7PZAuItnjch61LWEYA5w6E4mLD6cjZCIH227GpOViG7OgYm4LGbfnDzQj2x4hihZA42Q5eIJwgXZCoQtbncgFg45CZChoncYWyooSOZBe2hEroTb7ZBQyGN21NB1Fj86ZC5wKH628M5zxKBnpxSpV7phI4vtIfRtm66LdGvX9WUaTI";  // Escolha um token de verificação
+const PHONE_NUMBER_ID = "532180333320069";  // Seu ID do número do WhatsApp
 
 // Rota de verificação do webhook
 app.get('/webhook', (req, res) => {
